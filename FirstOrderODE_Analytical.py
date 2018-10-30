@@ -8,13 +8,18 @@ from keras.layers import Dense
 from math import log
 import numpy
 from copy import deepcopy
+from keras.layers import Activation
+from keras import backend as K
+from keras.utils.generic_utils import get_custom_objects
+import tensorflow as tf
 
+# ex x2 log x4
 globalFunctionCall = 'ex'
 trainUpperBound = 5
 trainLowerBound = 1
-testUpperBound = 6
-testLowerBound = 2
-trainDataSize = 2000
+testUpperBound = 20
+testLowerBound = 5
+trainDataSize = 3000
 testDataSize = 100
 
 # Test differential equation is dy/dx = 1/x
@@ -44,33 +49,49 @@ def applyFunctionEX(x):
         y[i] = np.exp(x[i])
     return y
 
-# Find the maximum value in the vector
-def findMaximum(y):
-    maxVal = [-1];
-    for i in range(0, len(y)):
-        if y[i] > maxVal:
-            maxVal = y[i]
-    return maxVal
-
-# Adjusting the y vector to be between 0 and 1
-def adjustVector(y, maximumValue):
-    for i in range(0, len(y)):
-        y[i] = y[i] / maximumValue
+# Test differential equation is dy/dx = x^3 + x^2 + x
+# The analytical solution to this equation is y = x^4/4 + x^3/3 + x^2/2 + c (we will ignore the contants)
+def applyFunctionX4(x):
+    y = np.linspace(0, 1, num=len(x))
+    y.shape = len(x), 1
+    for i in range(0, len(x)):
+        y[i] = x[i] ** 4 / 4 + x[i] ** 3 / 3 + x[i] ** 2 / 2
     return y
 
-# re-Adjusting the y vector to be actual values
-def reAdjustVector(y, maxVal):
-    for i in range(0, len(y)):
-        y[i] = y[i] * maxVal
-    return y
+# Custom activation function for log
+def custom_activation_x2(x):
+    return log(x, 2)
+
+# Custom activation function for e^x
+def custom_activation_ex(x):
+    return tf.math.exp(x)
+
+# Custom activation function for x^2
+def custom_activation_x2(x):
+    return x ** 2
+
+# Cutom activation function for x^4
+def custom_activation_x4(x):
+    return x ** 4
 
 # Neural Network Generator
 def generatePrediction(x_train, y_train, x_test):
+
+    # Custom Activation Function
+    if globalFunctionCall == 'x2':
+        get_custom_objects().update({'custom_activation': Activation(custom_activation_x2)})
+    elif globalFunctionCall == 'log':
+        get_custom_objects().update({'custom_activation': Activation(custom_activation_log)})
+    elif globalFunctionCall == 'ex':
+        get_custom_objects().update({'custom_activation': Activation(custom_activation_ex)})
+    elif globalFunctionCall == 'x4':
+        get_custom_objects().update({'custom_activation': Activation(custom_activation_x4)})
+
     model = Sequential()
     model.add(Dense(1, activation='relu', input_dim = 1))
     model.add(Dense(10, activation='relu'))
     model.add(Dense(10, activation='relu'))
-    model.add(Dense(1, activation='relu'))
+    model.add(Dense(1, activation='custom_activation'))
 
     #model.output_shape
     #model.summary()
@@ -124,22 +145,12 @@ if __name__ == "__main__":
     elif globalFunctionCall == 'ex':
         y_train = applyFunctionEX(x_train)
         y_test = applyFunctionEX(x_test)
-
-    y_train_temp = deepcopy(y_train)
-    maxValueY = findMaximum(y_train_temp)
-    y_train = adjustVector(y_train, maxValueY)
-
-    y_test_temp = deepcopy(y_test)
-    maxValueY_test = findMaximum(y_test_temp)
-    y_test = adjustVector(y_test, maxValueY_test)
+    elif globalFunctionCall == 'x4':
+        y_train = applyFunctionX4(x_train)
+        y_test = applyFunctionX4(x_test)
 
     # Generate the prediction provided the training information
     y_pred = generatePrediction(x_train, y_train, x_test)
 
-    # Re-adjust output
-    y_test = reAdjustVector(y_test, maxValueY_test)
-    y_pred = reAdjustVector(y_pred, maxValueY_test)
-
     # Plot the results
     plot(x_train, y_pred, y_test)
-
