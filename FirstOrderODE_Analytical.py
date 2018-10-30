@@ -9,11 +9,11 @@ from math import log
 import numpy
 from copy import deepcopy
 
-globalFunctionCall = 'log'
-trainUpperBound = 90
-trainLowerBound = 10
-testUpperBound = 1000
-testLowerBound = 100
+globalFunctionCall = 'ex'
+trainUpperBound = 5
+trainLowerBound = 1
+testUpperBound = 6
+testLowerBound = 2
 trainDataSize = 2000
 testDataSize = 100
 
@@ -33,6 +33,15 @@ def applyFunctionX2(x):
     y.shape = len(x), 1
     for i in range(0, len(x)):
         y[i] = x[i] ** 2 / 2
+    return y
+
+# Test differential equation is dy/dx = y
+# The analytical solution to this equation is y = e^x + c (we will ignore the contants)
+def applyFunctionEX(x):
+    y = np.linspace(0, 1, num=len(x))
+    y.shape = len(x), 1
+    for i in range(0, len(x)):
+        y[i] = np.exp(x[i])
     return y
 
 # Find the maximum value in the vector
@@ -112,6 +121,9 @@ if __name__ == "__main__":
     elif globalFunctionCall == 'log':
         y_train = applyFunctionLog(x_train)
         y_test = applyFunctionLog(x_test)
+    elif globalFunctionCall == 'ex':
+        y_train = applyFunctionEX(x_train)
+        y_test = applyFunctionEX(x_test)
 
     y_train_temp = deepcopy(y_train)
     maxValueY = findMaximum(y_train_temp)
