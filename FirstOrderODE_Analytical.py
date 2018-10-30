@@ -12,8 +12,8 @@ from copy import deepcopy
 globalFunctionCall = 'log'
 trainUpperBound = 90
 trainLowerBound = 10
-testUpperBound = 110
-testLowerBound = 50
+testUpperBound = 1000
+testLowerBound = 100
 trainDataSize = 2000
 testDataSize = 100
 
@@ -91,6 +91,12 @@ def plot(x, y_pred, y_analytical):
     plt.xlim([testLowerBound, testUpperBound])
     name = globalFunctionCall + '.png'
     plt.savefig(name)
+
+    localError = 0
+    for i in range(0, len(y_pred)):
+        localError += abs((y_pred[i] - y_analytical[i]) / y_analytical[i]) * 100
+    avgError = localError / len(y_pred)
+    print("On average, the error is: ", avgError, " %")
 
 # Main
 if __name__ == "__main__":
