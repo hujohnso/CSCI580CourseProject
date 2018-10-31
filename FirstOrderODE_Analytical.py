@@ -14,7 +14,7 @@ from keras.utils.generic_utils import get_custom_objects
 import tensorflow as tf
 
 # ex x2 log x4
-globalFunctionCall = 'ex'
+globalFunctionCall = 'log'
 trainUpperBound = 5
 trainLowerBound = 1
 testUpperBound = 20
@@ -28,7 +28,7 @@ def applyFunctionLog(x):
     y = np.linspace(0, 1, num=len(x))
     y.shape = len(x), 1
     for i in range(0, len(x)):
-        y[i] = log(x[i], 2)
+        y[i] = log(x[i])
     return y
 
 # Test differential equation is dy/dx = x
@@ -59,8 +59,8 @@ def applyFunctionX4(x):
     return y
 
 # Custom activation function for log
-def custom_activation_x2(x):
-    return log(x, 2)
+def custom_activation_log(x):
+    return tf.log(x)
 
 # Custom activation function for e^x
 def custom_activation_ex(x):
