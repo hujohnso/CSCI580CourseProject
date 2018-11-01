@@ -1,0 +1,17 @@
+General todo
+    - implement analytical 2nd order in diff_eq/
+    - implement non-analytical 2nd order in diff_eq/
+    - implement simple pde in diff_eq/
+    - combining params file with general
+    - look into gradient descent
+    - implement pde solve
+    - apply to navier-stokes
+
+Clay's todo
+    - implementing non-analytical odes in diff_eq/ (no params)
+    - implement fin diff equations for the training and test y values
+
+Hunter's todo
+    - implement parameter intake (with one parameter)
+    - implement general parameter intake
+    - understanding datasize for good approx
