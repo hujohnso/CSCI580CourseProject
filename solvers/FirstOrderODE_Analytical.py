@@ -17,6 +17,7 @@ testUpperBound = 6
 testLowerBound = 4
 trainDataSize = 300
 testDataSize = 100
+constant = 3
 
 # Neural Network Generator
 def generatePrediction(myODE):
@@ -68,9 +69,9 @@ if __name__ == "__main__":
     x_test = np.linspace(testLowerBound, testUpperBound, num=testDataSize)
     x_test.shape = testDataSize, 1
 
-    myODE = ode.x2(x_test, x_train)
-    myODE.y_test = ode.x2.func(x_test)
-    myODE.y_train = ode.x2.func(x_train)
+    myODE = ode.x4(x_test, x_train,np.array([1,5,2]))
+    myODE.y_test = ode.x4.func(myODE,x_test)
+    myODE.y_train = ode.x4.func(myODE, x_train)
 
     # Generate the prediction provided the training information
     y_pred = generatePrediction(myODE)
