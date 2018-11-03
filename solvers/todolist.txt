@@ -12,6 +12,6 @@ Clay's todo
     - implement fin diff equations for the training and test y values
 
 Hunter's todo
-    - implement parameter intake (with one parameter)
+    - (Done Waiting Clay's approval)implement parameter intake (with one parameter)
     - implement general parameter intake
     - understanding datasize for good approx
