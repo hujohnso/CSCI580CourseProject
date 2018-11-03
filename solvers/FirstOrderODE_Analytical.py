@@ -17,8 +17,10 @@ testUpperBound = 6
 testLowerBound = 4
 trainDataSize = 300
 testDataSize = 100
-constant = 1
-odeClassToUse = ode.x2
+testConstants = None
+trainConstants = None
+constant = None
+odeClassToUse = ode.ex
 
 # Neural Network Generator
 def generatePrediction(myODE):
