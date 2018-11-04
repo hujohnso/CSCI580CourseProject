@@ -18,10 +18,10 @@ testLowerBound = 4
 trainDataSize = 5
 testDataSize = 100
 #rows will be the particular constants and columns will be each iteration
-testConstants = np.array([[3],[4]])
-trainConstants = np.array([[1],[2],[3]])
+testConstants = np.array([[3,2,3],[4,3,2]])
+trainConstants = np.array([[1,4,1],[16,18,20],[3,7,6]])
 constant = None
-odeClassToUse = ode.x2
+odeClassToUse = ode.x4
 
 #This looks a little confusing but all it is doing is combining the x_Train_Matrix with the proper constants
 #that correspond to the evaluation
@@ -32,8 +32,9 @@ def pairConstantsMatrixAndXMatrixForDNNInput(x_Matrix, constantsMatrix):
     constantsExpandedMatrix = np.zeros(shape = (constantsMatrix.shape[1],len(x_Matrix) * constantsLength))
     for i in range(constantsMatrix.shape[1]):
         for j in range(constantsLength):
-            input_Matrix[i + 1,len(x_Matrix) * j:len(x_Matrix) * (j + 1)] = np.repeat(constantsMatrix[j,:],len(x_Matrix))
+            input_Matrix[i + 1,len(x_Matrix) * j:len(x_Matrix) * (j + 1)] = np.repeat(constantsMatrix[j,i],len(x_Matrix))
     return input_Matrix
+
 def generatePrediction(myODE):
 
     get_custom_objects().update({'custom_activation': Activation(myODE.custom_activation)})
@@ -59,7 +60,7 @@ def generatePrediction(myODE):
 def plotMatrixData(x_test, y_test, line, labelValue):
     for i in range(x_test.shape[1]):
         plt.plot(x_test[:,i].transpose(),y_test[:,i].transpose(), line , label = labelValue)
- #y_pred.reshape(x_test.shape[0],x_test.shape[1],order='F')
+
 def plot(myODE, y_pred):
     tfit = np.linspace(testLowerBound, testUpperBound, num=testDataSize).reshape(-1, 1)
     plotMatrixData(myODE.x_test,myODE.y_test, 'r--', 'analytical soln')
@@ -106,7 +107,5 @@ if __name__ == "__main__":
     y_pred = generatePrediction(myODE)
 
     plot(myODE, y_pred)
-    
     calculateError(y_pred,myODE)
-    
     
