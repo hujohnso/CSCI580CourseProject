@@ -8,8 +8,7 @@ General todo
     - apply to navier-stokes
 
 Clay's todo
-    - implementing non-analytical odes in diff_eq/ (no params)
-    - implement fin diff equations for the training and test y values
+    - add more functions to fin diff ode
 
 Hunter's todo
     - implement parameter intake (with one parameter)
