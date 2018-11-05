@@ -15,13 +15,21 @@ trainUpperBound = 5
 trainLowerBound = 1
 testUpperBound = 6
 testLowerBound = 4
-trainDataSize = 5
+trainDataSize = 100
 testDataSize = 100
 #rows will be the particular constants and columns will be each iteration
-testConstants = np.array([[3,2,3],[4,3,2]])
-trainConstants = np.array([[1,4,1],[16,18,20],[3,7,6]])
-constant = None
-odeClassToUse = ode.x4
+# testConstants = np.array([[3,2,3],[4,3,2]])
+# trainConstants = np.array([[1,4,1],[16,18,20],[3,7,6]])
+# odeClassToUse = ode.x4
+# testConstants = np.array([[3],[4],[5]])
+# trainConstants = np.array([[3],[4],[5]])
+# odeClassToUse = ode.x2
+# testConstants = np.array([[3],[4],[5]])
+# trainConstants = np.array([[3],[4],[5]])
+# odeClassToUse = ode.ex
+testConstants = np.array([[3],[4],[5]])
+trainConstants = np.array([[3],[4],[5]])
+odeClassToUse = ode.log
 
 #This looks a little confusing but all it is doing is combining the x_Train_Matrix with the proper constants
 #that correspond to the evaluation
@@ -62,7 +70,6 @@ def plotMatrixData(x_test, y_test, line, labelValue):
         plt.plot(x_test[:,i].transpose(),y_test[:,i].transpose(), line , label = labelValue)
 
 def plot(myODE, y_pred):
-    tfit = np.linspace(testLowerBound, testUpperBound, num=testDataSize).reshape(-1, 1)
     plotMatrixData(myODE.x_test,myODE.y_test, 'r--', 'analytical soln')
     plotMatrixData(myODE.x_test,y_pred,'b--','DNN soln')
     plt.legend()

@@ -59,7 +59,7 @@ class log(analyticalODE1):
         super().__init__(x_test, x_train)
 
     def func(self, x,constants=np.array([1])):
-        return super(log, self).performAnalyticalFunction(lambda value,constant: constant * log(value), x, constants)
+        return super(log, self).performAnalyticalFunction(lambda value,constant: constant * np.log(value), x, constants)
     
     @staticmethod
     def custom_activation(x):
