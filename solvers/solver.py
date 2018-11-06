@@ -76,7 +76,7 @@ def plot(myODE, y_pred):
     plt.legend()
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.xlim([myODE.x_test[0], myODE.x_test[len(myODE.x_test)-1]])
+    ##plt.xlim([myODE.x_test[0], myODE.x_test[len(myODE.x_test)-1]])
     plt.savefig('image.png')
 
 def calculateError(y_pred, myODE):
@@ -105,7 +105,7 @@ def getConstantsLength(constants):
     return constantsLength
 
 if __name__ == "__main__":
-    numpy.random.seed(7)
+    np.random.seed(7)
     x_train = initialize_X_Array(trainLowerBound,trainUpperBound,trainDataSize,trainConstants)
     x_test = initialize_X_Array(testLowerBound,testUpperBound,testDataSize,testConstants)
     myODE = odeClassToUse(x_test, x_train)
