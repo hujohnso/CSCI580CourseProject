@@ -10,25 +10,6 @@ import time
 import tensorflow as tf
 import differential_equations.AnalyticalODE1 as ode
 
-trainUpperBound = 5
-trainLowerBound = 1
-testUpperBound = 6
-testLowerBound = 4
-trainDataSize = 100
-testDataSize = 100
-#rows will be the particular constants and columns will be each iteration
-# testConstants = np.array([[3,2,3],[4,3,2]])
-# trainConstants = np.array([[1,4,1],[16,18,20],[3,7,6]])
-# odeClassToUse = ode.x4
-# testConstants = np.array([[3],[4],[5]])
-# trainConstants = np.array([[3],[4],[5]])
-# odeClassToUse = ode.x2
-# testConstants = np.array([[3],[4],[5]])
-# trainConstants = np.array([[3],[4],[5]])
-# odeClassToUse = ode.ex
-testConstants = np.array([[3],[4],[5]])
-trainConstants = np.array([[3],[4],[5]])
-odeClassToUse = ode.log
 
 #This looks a little confusing but all it is doing is combining the x_Train_Matrix with the proper constants
 #that correspond to the evaluation
@@ -42,7 +23,7 @@ def pairConstantsMatrixAndXMatrixForDNNInput(x_Matrix, constantsMatrix):
             input_Matrix[i + 1,len(x_Matrix) * j:len(x_Matrix) * (j + 1)] = np.repeat(constantsMatrix[j,i],len(x_Matrix))
     return input_Matrix
 
-def generatePrediction(myODE):
+def generatePrediction(myODE, trainConstants, testConstants):
 
     get_custom_objects().update({'custom_activation': Activation(myODE.custom_activation)})
 
@@ -57,14 +38,14 @@ def generatePrediction(myODE):
     model.compile(loss='mean_squared_error',
               optimizer='adam',
               metrics=['accuracy'])
-    
+
     x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_train,trainConstants).transpose()
     model.fit(x_input_for_model, myODE.y_train.flatten('C').reshape(-1,1), epochs=20, batch_size=2, verbose=0)
     x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_test, testConstants).transpose()
     startNN = time.clock()
     y_pred = model.predict(x_input_for_model)
     print("Total time for NN approximation is: ", time.clock() - startNN)
-    return y_pred.reshape(x_test.shape[0],x_test.shape[1],order='F')
+    return y_pred.reshape(myODE.x_test.shape[0], myODE.x_test.shape[1],order='F')
 
 def plotMatrixData(x_test, y_test, line, labelValue):
     for i in range(x_test.shape[1]):
@@ -83,10 +64,12 @@ def calculateError(y_pred, myODE):
     localError = 0
     for i in range(myODE.y_test.shape[0]):
         for j in range(myODE.y_test.shape[1]):
+            if myODE.y_test[i,j] == 0:
+                continue
             localError += abs((y_pred[i,j] - myODE.y_test[i,j]) /myODE. y_test[i,j]) * 100
     avgError = localError / (myODE.y_test.size)
     print("On average, the error is: ", avgError, " %")
-    
+
 def initialize_X_Array(lowerBound, upperBound, dataSize , constants):
     constantsLength = getConstantsLength(constants)
     x = np.linspace(lowerBound, upperBound, num= dataSize)
@@ -103,17 +86,3 @@ def getConstantsLength(constants):
     else:
         constantsLength = constants.shape[0]
     return constantsLength
-
-if __name__ == "__main__":
-    np.random.seed(7)
-    x_train = initialize_X_Array(trainLowerBound,trainUpperBound,trainDataSize,trainConstants)
-    x_test = initialize_X_Array(testLowerBound,testUpperBound,testDataSize,testConstants)
-    myODE = odeClassToUse(x_test, x_train)
-    myODE.y_train = odeClassToUse.func(myODE, x_train,trainConstants)
-    myODE.y_test = odeClassToUse.func(myODE,x_test,testConstants)
-
-    y_pred = generatePrediction(myODE)
-
-    plot(myODE, y_pred)
-    calculateError(y_pred,myODE)
-    
