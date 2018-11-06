@@ -11,6 +11,6 @@ Clay's todo
     - add more functions to fin diff ode
 
 Hunter's todo
-    - implement parameter intake (with one parameter)
+    - (Done Waiting Clay's approval )implement parameter intake (with one parameter)
     - implement general parameter intake
     - understanding datasize for good approx

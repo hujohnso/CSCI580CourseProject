@@ -7,14 +7,47 @@ from keras import backend as K
 from keras.utils.generic_utils import get_custom_objects
 import autograd.numpy as np
 import time
+import tensorflow as tf
+import differential_equations.AnalyticalODE1 as ode
 
-# Neural Network Generator
+trainUpperBound = 5
+trainLowerBound = 1
+testUpperBound = 6
+testLowerBound = 4
+trainDataSize = 100
+testDataSize = 100
+#rows will be the particular constants and columns will be each iteration
+# testConstants = np.array([[3,2,3],[4,3,2]])
+# trainConstants = np.array([[1,4,1],[16,18,20],[3,7,6]])
+# odeClassToUse = ode.x4
+# testConstants = np.array([[3],[4],[5]])
+# trainConstants = np.array([[3],[4],[5]])
+# odeClassToUse = ode.x2
+# testConstants = np.array([[3],[4],[5]])
+# trainConstants = np.array([[3],[4],[5]])
+# odeClassToUse = ode.ex
+testConstants = np.array([[3],[4],[5]])
+trainConstants = np.array([[3],[4],[5]])
+odeClassToUse = ode.log
+
+#This looks a little confusing but all it is doing is combining the x_Train_Matrix with the proper constants
+#that correspond to the evaluation
+def pairConstantsMatrixAndXMatrixForDNNInput(x_Matrix, constantsMatrix):
+    constantsLength = getConstantsLength(constantsMatrix)
+    input_Matrix = y = np.zeros(shape=(constantsMatrix.shape[1] + 1, len(x_Matrix) * constantsLength))
+    input_Matrix[0,:] = x_Matrix.flatten('F')
+    constantsExpandedMatrix = np.zeros(shape = (constantsMatrix.shape[1],len(x_Matrix) * constantsLength))
+    for i in range(constantsMatrix.shape[1]):
+        for j in range(constantsLength):
+            input_Matrix[i + 1,len(x_Matrix) * j:len(x_Matrix) * (j + 1)] = np.repeat(constantsMatrix[j,i],len(x_Matrix))
+    return input_Matrix
+
 def generatePrediction(myODE):
 
     get_custom_objects().update({'custom_activation': Activation(myODE.custom_activation)})
 
     model = Sequential()
-    model.add(Dense(1, activation='relu', input_dim = 1))
+    model.add(Dense(1, activation='relu', input_dim = trainConstants.shape[1] + 1))
     model.add(Dense(10, activation='relu'))
     model.add(Dense(10, activation='relu'))
     model.add(Dense(1, activation='custom_activation'))
@@ -24,32 +57,63 @@ def generatePrediction(myODE):
     model.compile(loss='mean_squared_error',
               optimizer='adam',
               metrics=['accuracy'])
-
-    model.fit(myODE.x_train, myODE.y_train, epochs=20, batch_size=2, verbose=0)
-
-    #score = model.evaluate(x_test, y_test, verbose=1)  #print(score)
-
-    # y_pred contains the prediction with the x_test input
+    
+    x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_train,trainConstants).transpose()
+    model.fit(x_input_for_model, myODE.y_train.flatten('C').reshape(-1,1), epochs=20, batch_size=2, verbose=0)
+    x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_test, testConstants).transpose()
     startNN = time.clock()
-    y_pred = model.predict(myODE.x_test)
+    y_pred = model.predict(x_input_for_model)
     print("Total time for NN approximation is: ", time.clock() - startNN)
-    return y_pred
+    return y_pred.reshape(x_test.shape[0],x_test.shape[1],order='F')
 
-# Plotting function
+def plotMatrixData(x_test, y_test, line, labelValue):
+    for i in range(x_test.shape[1]):
+        plt.plot(x_test[:,i].transpose(),y_test[:,i].transpose(), line , label = labelValue)
+
 def plot(myODE, y_pred):
-    tfit = myODE.x_test
-    plt.plot(tfit, y_pred, label='soln')
-    plt.plot(tfit, myODE.y_test, 'r--', label='analytical soln')
+    plotMatrixData(myODE.x_test,myODE.y_test, 'r--', 'analytical soln')
+    plotMatrixData(myODE.x_test,y_pred,'b--','DNN soln')
     plt.legend()
     plt.xlabel('x')
     plt.ylabel('y')
     plt.xlim([myODE.x_test[0], myODE.x_test[len(myODE.x_test)-1]])
     plt.savefig('image.png')
 
+def calculateError(y_pred, myODE):
     localError = 0
-    for i in range(0, len(y_pred)):
-        if myODE.y_test[i] == 0:
-            continue
-        localError += abs((y_pred[i] - myODE.y_test[i]) /myODE.y_test[i]) * 100
-    avgError = localError / len(y_pred)
+    for i in range(myODE.y_test.shape[0]):
+        for j in range(myODE.y_test.shape[1]):
+            localError += abs((y_pred[i,j] - myODE.y_test[i,j]) /myODE. y_test[i,j]) * 100
+    avgError = localError / (myODE.y_test.size)
     print("On average, the error is: ", avgError, " %")
+    
+def initialize_X_Array(lowerBound, upperBound, dataSize , constants):
+    constantsLength = getConstantsLength(constants)
+    x = np.linspace(lowerBound, upperBound, num= dataSize)
+    x.shape = len(x),1
+    x_array = np.zeros(shape=(len(x),constantsLength))
+    for j in range(0, constantsLength):
+        x_array[:,j] = list(x)
+    return x_array
+
+#This is necessary to incorporate the case in which constants is set to none
+def getConstantsLength(constants):
+    if constants is None:
+        constantsLength = 1
+    else:
+        constantsLength = constants.shape[0]
+    return constantsLength
+
+if __name__ == "__main__":
+    numpy.random.seed(7)
+    x_train = initialize_X_Array(trainLowerBound,trainUpperBound,trainDataSize,trainConstants)
+    x_test = initialize_X_Array(testLowerBound,testUpperBound,testDataSize,testConstants)
+    myODE = odeClassToUse(x_test, x_train)
+    myODE.y_train = odeClassToUse.func(myODE, x_train,trainConstants)
+    myODE.y_test = odeClassToUse.func(myODE,x_test,testConstants)
+
+    y_pred = generatePrediction(myODE)
+
+    plot(myODE, y_pred)
+    calculateError(y_pred,myODE)
+    
