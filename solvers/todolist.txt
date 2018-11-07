@@ -7,10 +7,12 @@ General todo
     - implement pde solve
     - apply to navier-stokes
 
+    - reading papers
+
 Clay's todo
+    - adjust fin diff ode to take in params
     - add more functions to fin diff ode
 
 Hunter's todo
-    - (Done Waiting Clay's approval )implement parameter intake (with one parameter)
-    - implement general parameter intake
-    - understanding datasize for good approx
+    - auto constant generation
+    - parameterize model generation
