@@ -8,14 +8,13 @@ from keras.utils.generic_utils import get_custom_objects
 import autograd.numpy as np
 import time
 import tensorflow as tf
-import differential_equations.AnalyticalODE1 as ode
 
 
 #This looks a little confusing but all it is doing is combining the x_Train_Matrix with the proper constants
 #that correspond to the evaluation
 def pairConstantsMatrixAndXMatrixForDNNInput(x_Matrix, constantsMatrix):
     constantsLength = getConstantsLength(constantsMatrix)
-    input_Matrix = y = np.zeros(shape=(constantsMatrix.shape[1] + 1, len(x_Matrix) * constantsLength))
+    input_Matrix = np.zeros(shape=(constantsMatrix.shape[1] + 1, len(x_Matrix) * constantsLength))
     input_Matrix[0,:] = x_Matrix.flatten('F')
     constantsExpandedMatrix = np.zeros(shape = (constantsMatrix.shape[1],len(x_Matrix) * constantsLength))
     for i in range(constantsMatrix.shape[1]):
@@ -25,13 +24,13 @@ def pairConstantsMatrixAndXMatrixForDNNInput(x_Matrix, constantsMatrix):
 
 def generatePrediction(myODE, trainConstants, testConstants):
 
-    get_custom_objects().update({'custom_activation': Activation(myODE.custom_activation)})
+    get_custom_objects().update({'custom': Activation(myODE.custom_activation)})
 
     model = Sequential()
-    model.add(Dense(1, activation='relu', input_dim = trainConstants.shape[1] + 1))
-    model.add(Dense(10, activation='relu'))
-    model.add(Dense(10, activation='relu'))
-    model.add(Dense(1, activation='custom_activation'))
+    model.add(Dense(1, activation='custom', input_dim = trainConstants.shape[1] + 1))
+    model.add(Dense(20, activation='relu'))
+    model.add(Dense(20, activation='relu'))
+    model.add(Dense(1, activation='relu'))
 
     #model.output_shape   #model.summary()  #model.get_config()  #model.get_weights()
 
@@ -40,7 +39,7 @@ def generatePrediction(myODE, trainConstants, testConstants):
               metrics=['accuracy'])
 
     x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_train,trainConstants).transpose()
-    model.fit(x_input_for_model, myODE.y_train.flatten('C').reshape(-1,1), epochs=20, batch_size=2, verbose=0)
+    model.fit(x_input_for_model, myODE.y_train.flatten('F').reshape(-1,1), epochs=40, batch_size=5, verbose=0)
     x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_test, testConstants).transpose()
     startNN = time.clock()
     y_pred = model.predict(x_input_for_model)
@@ -53,7 +52,7 @@ def plotMatrixData(x_test, y_test, line, labelValue):
 
 def plot(myODE, y_pred):
     plotMatrixData(myODE.x_test,myODE.y_test, 'r--', 'analytical soln')
-    plotMatrixData(myODE.x_test,y_pred,'b--','DNN soln')
+    plotMatrixData(myODE.x_test,y_pred,'b','DNN soln')
     plt.legend()
     plt.xlabel('x')
     plt.ylabel('y')

@@ -7,40 +7,42 @@ import numpy
 import time
 
 trainUpperBound = 10
-trainLowerBound = 1
+trainLowerBound = 0
 testUpperBound = 15
-testLowerBound = 1
-trainDataSize = 300
-testDataSize = 100
+testLowerBound = 0
+trainDataSize = 500
+testDataSize = 200
 
 #rows will be the particular constants and columns will be each iteration
-# testConstants = np.array([[3,2,3],[4,3,2]])
-# trainConstants = np.array([[1,4,1],[16,18,20],[3,7,6]])
-# odeClassToUse = ode.x4
+#testConstants = np.array([[3,2,3],[4,3,2]])
+#trainConstants = np.array([[3,2,2],[3,2,2],[4,3,3]])
+#testConstants = np.array([[5,5,5]])
+#trainConstants = np.array([[1,1,1], [1,1,5],[1,5,1],[5,1,1], [10,5,5], [5,10,5],[5,5,10], [5,5,5]])
+# ClassToUse = ode.x4
+
+testConstants = np.array([[1]])
+trainConstants = np.array([[1]])
+#ClassToUse = ode.x2
+ClassToUse = findiffODE.neg_ex
 
 # testConstants = np.array([[3],[4],[5]])
 # trainConstants = np.array([[3],[4],[5]])
-# odeClassToUse = ode.x2
+# ClassToUse = ode.ex
 
-# testConstants = np.array([[3],[4],[5]])
-# trainConstants = np.array([[3],[4],[5]])
-# odeClassToUse = ode.ex
-
-testConstants = np.array([[3],[4],[5]])
-trainConstants = np.array([[3],[4],[5]])
-ClassToUse = ode.log
-
+#testConstants = np.array([[3],[4],[5]])
+#testConstants = np.array([[4]])
+#trainConstants = np.array([[3.97], [3.99], [4.01], [4.03]])
+#ClassToUse = ode.log
 
 if __name__ == "__main__":
     numpy.random.seed(7)
     x_train = initialize_X_Array(trainLowerBound,trainUpperBound,trainDataSize,trainConstants)
     x_test = initialize_X_Array(testLowerBound,testUpperBound,testDataSize,testConstants)
-    # Fin Diff ODE need a second argument
     myODE = ClassToUse(x_test, x_train)
 
-    myODE.y_train = ClassToUse.func(myODE, x_train,trainConstants)
+    myODE.y_train = ClassToUse.func(myODE, x_train) #, x_train)#,trainConstants)
     startFinDiff = time.clock()
-    myODE.y_test = ClassToUse.func(myODE,x_test,testConstants)
+    myODE.y_test = ClassToUse.func(myODE, x_test) #,x_test)#,testConstants)
     print("Total time for finite difference approximation is: ", time.clock() - startFinDiff)
 
     #x_train.shape = trainDataSize, 1
