@@ -10,7 +10,7 @@ trainUpperBound = 10
 trainLowerBound = 0
 testUpperBound = 10
 testLowerBound = 0
-trainDataSize = 500
+trainDataSize = 1000
 testDataSize = 200
 
 #rows will be the particular constants and columns will be each iteration
@@ -20,10 +20,12 @@ testDataSize = 200
 #trainConstants = np.array([[1,1,1], [1,1,5],[1,5,1],[5,1,1], [10,5,5], [5,10,5],[5,5,10], [5,5,5]])
 # ClassToUse = ode.x4
 
-testConstants = np.array([[4.9]])
-trainConstants = np.array([[4.8], [4.9], [5]])
-#ClassToUse = ode.x2
-ClassToUse = findiffODE.x2
+testConstants = np.array([[5],[6],[7]])
+ClassToUse = ode.x2
+# ClassToUse = findiffODE.x2
+trainConstantsLowerBound = .1
+trainConstantsUpperBound = 10
+numberOfTrainConstants = 50
 
 # testConstants = np.array([[3],[4],[5]])
 # trainConstants = np.array([[3],[4],[5]])
@@ -33,9 +35,19 @@ ClassToUse = findiffODE.x2
 #testConstants = np.array([[4]])
 #trainConstants = np.array([[3.97], [3.99], [4.01], [4.03]])
 #ClassToUse = ode.log
+numberOfNodesInLayer = np.array([1,50,50,50,500,1])
+#377.0856934972127  %[1,10,10,1]
+
+activationOfLayer = np.array(['custom','linear','linear','linear','linear','linear'])
+
+def produceConstantsFromRangeAndGrain(upperBound, lowerBound, numberOfConstants):
+    return numpy.linspace(lowerBound, upperBound, numberOfConstants)
+
 
 if __name__ == "__main__":
     numpy.random.seed(7)
+    trainConstants = produceConstantsFromRangeAndGrain(trainConstantsUpperBound, trainConstantsLowerBound, numberOfTrainConstants)
+    trainConstants = trainConstants.reshape(len(trainConstants),1)
     x_train = initialize_X_Array(trainLowerBound,trainUpperBound,trainDataSize,trainConstants)
     x_test = initialize_X_Array(testLowerBound,testUpperBound,testDataSize,testConstants)
     myODE = ClassToUse(x_test, x_train)
@@ -49,7 +61,7 @@ if __name__ == "__main__":
     #x_test.shape = testDataSize, 1
 
     # Generate the prediction provided the training information
-    y_pred = generatePrediction(myODE, trainConstants, testConstants)
+    y_pred = generatePrediction(myODE, trainConstants, testConstants,numberOfNodesInLayer,activationOfLayer)
 
     # Plot the results
     plot(myODE, y_pred)

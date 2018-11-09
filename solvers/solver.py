@@ -13,7 +13,7 @@ import tensorflow as tf
 #This looks a little confusing but all it is doing is combining the x_Train_Matrix with the proper constants
 #that correspond to the evaluation
 def pairConstantsMatrixAndXMatrixForDNNInput(x_Matrix, constantsMatrix):
-    constantsLength = getConstantsLength(constantsMatrix)
+    constantsLength = constantsMatrix.shape[0]
     input_Matrix = np.zeros(shape=(constantsMatrix.shape[1] + 1, len(x_Matrix) * constantsLength))
     input_Matrix[0,:] = x_Matrix.flatten('F')
     constantsExpandedMatrix = np.zeros(shape = (constantsMatrix.shape[1],len(x_Matrix) * constantsLength))
@@ -22,22 +22,21 @@ def pairConstantsMatrixAndXMatrixForDNNInput(x_Matrix, constantsMatrix):
             input_Matrix[i + 1,len(x_Matrix) * j:len(x_Matrix) * (j + 1)] = np.repeat(constantsMatrix[j,i],len(x_Matrix))
     return input_Matrix
 
-def generatePrediction(myODE, trainConstants, testConstants):
-
+def generateParameterizedModel(myODE, trainConstants, numberOfNodesInLayer, activationOfLayer):
     get_custom_objects().update({'custom': Activation(myODE.custom_activation)})
-
     model = Sequential()
-    model.add(Dense(1, activation='custom', input_dim = trainConstants.shape[1] + 1))
-    model.add(Dense(20, activation='relu'))
-    model.add(Dense(20, activation='relu'))
-    model.add(Dense(1, activation='relu'))
-
-    #model.output_shape   #model.summary()  #model.get_config()  #model.get_weights()
-
+    for i in range(numberOfNodesInLayer[0]):
+        if i == 0:
+            model.add(Dense(numberOfNodesInLayer[i],activation = activationOfLayer[i],input_dim = trainConstants.shape[1] + 1))
+        model.add(Dense(numberOfNodesInLayer[i], activation = activationOfLayer[i]))
     model.compile(loss='mean_squared_error',
               optimizer='adam',
               metrics=['accuracy'])
+    return model
 
+
+def generatePrediction(myODE, trainConstants, testConstants,numberOfNodesInLayer, activationOfLayer):
+    model = generateParameterizedModel(myODE,trainConstants,numberOfNodesInLayer,activationOfLayer)
     x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_train,trainConstants).transpose()
     model.fit(x_input_for_model, myODE.y_train.flatten('F').reshape(-1,1), epochs=40, batch_size=5, verbose=0)
     x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_test, testConstants).transpose()
@@ -70,7 +69,7 @@ def calculateError(y_pred, myODE):
     print("On average, the error is: ", avgError, " %")
 
 def initialize_X_Array(lowerBound, upperBound, dataSize , constants):
-    constantsLength = getConstantsLength(constants)
+    constantsLength = constants.shape[0]
     x = np.linspace(lowerBound, upperBound, num= dataSize)
     x.shape = len(x),1
     x_array = np.zeros(shape=(len(x),constantsLength))
@@ -78,10 +77,3 @@ def initialize_X_Array(lowerBound, upperBound, dataSize , constants):
         x_array[:,j] = list(x)
     return x_array
 
-#This is necessary to incorporate the case in which constants is set to none
-def getConstantsLength(constants):
-    if constants is None:
-        constantsLength = 1
-    else:
-        constantsLength = constants.shape[0]
-    return constantsLength

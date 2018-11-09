@@ -19,10 +19,7 @@ class finDiffODE1:
         return y
 
     def performFunction(self, x, constants):
-        if constants is None:
-            constantsLength = 1
-        else:
-            constantsLength = constants.shape[0]
+        constantsLength = constants.shape[0]
         y = np.zeros(shape=(len(x),constantsLength))
         self.constants = constants
         for j in range(0, constantsLength):

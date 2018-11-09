@@ -9,10 +9,7 @@ class analyticalODE1:
     #I didn't feel like repeating the logic for all of the seperate functions
     #so here is a generic evaluator for all of the sub classes to use :)
     def performAnalyticalFunction(self ,functionToPerform, x , constants):
-        if constants is None:
-            constantsLength = 1
-        else:
-            constantsLength = constants.shape[0]
+        constantsLength = constants.shape[0]
         y = np.zeros(shape=(len(x),constantsLength))
         for j in range(0, constantsLength):
             for i in range(0, len(x)):
@@ -28,7 +25,7 @@ class x2(analyticalODE1):
 
     @staticmethod
     def custom_activation(x):
-        return x ** 2
+        return 2*(x ** 2)
 
 class x4(analyticalODE1):
     def __init__(self, x_test, x_train):
