@@ -10,8 +10,7 @@ General todo
     - reading papers
 
 Clay's todo
-    - adjust fin diff ode to take in params
-    - add more functions to fin diff ode
+    - begin second order
 
 Hunter's todo
     - auto constant generation
