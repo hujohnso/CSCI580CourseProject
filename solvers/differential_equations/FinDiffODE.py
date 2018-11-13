@@ -13,8 +13,9 @@ class finDiffODE1:
         t = copy.deepcopy(x)
         t = t.reshape(1, len(x))
         t = t[0]
-        y0 = 1 # initial condition
-        y = odeint(self.model, y0, t)
+        y = odeint(self.model, self.y0, t)
+        if len(self.y0) > 1:
+            y = y[:, 0]
         y.shape = len(x)
         return y
 
@@ -35,6 +36,7 @@ class finDiffODE1:
 class neg_ex(finDiffODE1):
     def __init__(self, x_test, x_train):
         super().__init__(x_test, x_train)
+        self.y0 = 1
 
     def model(self, y, t):
         k = self.constants[self.iteration][0]
@@ -51,6 +53,7 @@ class neg_ex(finDiffODE1):
 class neg_ex_2(finDiffODE1):
     def __init__(self, x_test, x_train):
         super().__init__(x_test, x_train)
+        self.y0 = 1
 
     def model(self, y, t):
         k = self.constants[self.iteration][0]
@@ -67,6 +70,7 @@ class neg_ex_2(finDiffODE1):
 class x2(finDiffODE1):
     def __init__(self, x_test, x_train):
         super().__init__(x_test, x_train)
+        self.y0 = 1
 
     def model(self, y, t):
         dydt = t*(1+(np.abs(t)))
@@ -82,6 +86,7 @@ class x2(finDiffODE1):
 class abssin(finDiffODE1):
     def __init__(self, x_test, x_train):
         super().__init__(x_test, x_train)
+        self.y0 = 1
 
     def model(self, y, t):
         dydt = t*np.abs(np.sin(t))
@@ -92,3 +97,22 @@ class abssin(finDiffODE1):
 
     def custom_activation(self, x):
         return x**2 + tf.cos(x) * x
+
+# y'' + y' + 2y = 0
+# x1' = x2
+# x2' = -2x1 - x2
+# x1(0) = 1, x2(0) = 0
+class secondOrder1(finDiffODE1):
+    def __init__(self, x_test, x_train):
+        super().__init__(x_test, x_train)
+        self.y0 = [1, 0]
+
+    def model(self, y, t):
+        dydt = [y[1], -2*y[0]-y[1]]
+        return dydt
+
+    def func(self, x, constants=np.array(1)):
+        return super(secondOrder1, self).performFunction(x, constants)
+
+    def custom_activation(self, x):
+        return tf.math.exp(-x)
