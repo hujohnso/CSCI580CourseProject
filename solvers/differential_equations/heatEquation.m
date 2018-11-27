@@ -1,5 +1,5 @@
 clear all
-N = 75; % Number of grid in x,y-direction
+N = 50; % Number of grid in x,y-direction
 L = 4*pi; % Domain size
 % Grid point
 x = linspace(0,L,N);
@@ -33,6 +33,7 @@ for ii=1:Tn
     frame = getframe(gcf);
     im = frame2im(frame);
     [A,map] = rgb2ind(im,256);
+    
     if ii==1
         imwrite(A,map,filename,'gif','LoopCount',Inf,'DelayTime',0.05);
     else
