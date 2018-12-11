@@ -86,9 +86,9 @@ for k = 1:nt
    U = U-diff(P)/hx;
    V = V-diff(P')'/hy;
    
-   name = strcat('/u/eu/es/hujohnso/Documents/CSCI580/project/CSCI580CourseProject/solvers/differential_equations/NavierStokesData/Pressure/', num2str(k * dt), '.csv');
+   name = strcat('/u/eu/es/hujohnso/Documents/CSCI580/project/CSCI580CourseProject/solvers/differential_equations/NavierStokesData/Pressure/', num2str((k * dt) * 100), '.csv');
    csvwrite(name, P);
-   name = strcat('/u/eu/es/hujohnso/Documents/CSCI580/project/CSCI580CourseProject/solvers/differential_equations/NavierStokesData/Velocity/', num2str(k * dt), '.csv');
+   name = strcat('/u/eu/es/hujohnso/Documents/CSCI580/project/CSCI580CourseProject/solvers/differential_equations/NavierStokesData/Velocity/', num2str((k * dt) * 100), '.csv');
    csvwrite(name, V);
   
    % visualization
