@@ -39,5 +39,9 @@ for ii=1:Tn
     else
         imwrite(A,map,filename,'gif','WriteMode','append','DelayTime',0.05);
     end
+   
+    name = strcat('../HeatEqnData/', num2str(ii), '.csv');
+    csvwrite(name, Z);
+    
 end
 
