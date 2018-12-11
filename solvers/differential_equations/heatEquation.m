@@ -20,7 +20,7 @@ handle_axes.CLim = [-10,10];
 title('Evolution of MATLAB Logo by Heat equation');
 dx = x(2)-x(1); % spatial grid size
 alpha = 2; % coefficient
-tspan = linspace(0,1,40);
+tspan = linspace(0,1,400);
 [t,u] = ode15s(@(t,x)getRHS(x,alpha,dx,N),tspan,u0(:));
 Tn = length(t);
 u = reshape(u,Tn,N-1,N-1);

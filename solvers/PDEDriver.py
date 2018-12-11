@@ -12,7 +12,7 @@ testLowerBound = 0
 trainDataSize = 500
 testDataSize = 100
 
-numberOfNodesInLayer = np.array([100, 1000, 2401])
+numberOfNodesInLayer = np.array([100,  2401])
 activationOfLayer = np.array(['relu', 'relu', 'relu'])
 ClassToUse = pde.heatEqn
 
@@ -21,7 +21,7 @@ def produceConstantsFromRangeAndGrain(upperBound, lowerBound, numberOfConstants)
 
 if __name__ == "__main__":
     numpy.random.seed(7)
-    x_train = numpy.linspace(1, 40, 40)
+    x_train = numpy.linspace(1, 400, 400)
     x_test = numpy.linspace(1, 1, 1)
 
     myDE = ClassToUse(x_test, x_train)
@@ -29,6 +29,8 @@ if __name__ == "__main__":
     # Generate the prediction provided the training information
     y_pred = generatePrediction(myDE, np.array([[1]]), np.array([[1]]), numberOfNodesInLayer, activationOfLayer)
 
+    np.savetxt('output.dat', y_pred)
+
     # Plot the results
-    plot(myDE, y_pred)
-    calculateError(y_pred,myDE)
+    #plot(myDE, y_pred)
+    #calculateError(y_pred,myDE)

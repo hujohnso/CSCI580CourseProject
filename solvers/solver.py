@@ -23,27 +23,35 @@ def pairConstantsMatrixAndXMatrixForDNNInput(x_Matrix, constantsMatrix):
     return input_Matrix
 
 def generateParameterizedModel(myODE, trainConstants, numberOfNodesInLayer, activationOfLayer):
-    get_custom_objects().update({'custom': Activation(myODE.custom_activation)})
     model = Sequential()
-    for i in range(numberOfNodesInLayer[0]):
+    for i in range(len(numberOfNodesInLayer)):
         if i == 0:
-            model.add(Dense(numberOfNodesInLayer[i],activation = activationOfLayer[i],input_dim = trainConstants.shape[1] + 1))
-        model.add(Dense(numberOfNodesInLayer[i], activation = activationOfLayer[i]))
+            #model.add(Dense(units=numberOfNodesInLayer[i], input_dim = trainConstants.shape[1] + 1))
+            model.add(Dense(units=numberOfNodesInLayer[i], input_dim = 1))
+            model.add(Activation(activationOfLayer[i]))
+        elif i == len(numberOfNodesInLayer) - 1:
+            model.add(Dense(units=numberOfNodesInLayer[i]))
+        else:
+            model.add(Dense(units=numberOfNodesInLayer[i]))
+            model.add(Activation(activationOfLayer[i]))
+
     model.compile(loss='mean_squared_error',
-              optimizer='adam',
-              metrics=['accuracy'])
+              optimizer='adam')
     return model
 
 
 def generatePrediction(myODE, trainConstants, testConstants,numberOfNodesInLayer, activationOfLayer):
     model = generateParameterizedModel(myODE,trainConstants,numberOfNodesInLayer,activationOfLayer)
-    x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_train,trainConstants).transpose()
-    model.fit(x_input_for_model, myODE.y_train.flatten('F').reshape(-1,1), epochs=40, batch_size=5, verbose=0)
-    x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_test, testConstants).transpose()
+    #x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_train,trainConstants).transpose()
+    model.fit(myODE.x_train, myODE.y_train, epochs=50, batch_size=1, verbose=0)
+    #x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_test, testConstants).transpose()
     startNN = time.clock()
-    y_pred = model.predict(x_input_for_model)
+    model.save('savedModel.h5')
+    y_pred = model.predict(myODE.x_test)
+    #y_pred = model.predict(x_input_for_model)
     print("Total time for NN approximation is: ", time.clock() - startNN)
-    return y_pred.reshape(myODE.x_test.shape[0], myODE.x_test.shape[1],order='F')
+    return y_pred
+    #return y_pred.reshape(myODE.x_test.shape[0], myODE.x_test.shape[1],order='F')
 
 def plotMatrixData(x_test, y_test, line, labelValue):
     for i in range(x_test.shape[1]):
@@ -55,6 +63,7 @@ def plot(myODE, y_pred):
     plt.legend()
     plt.xlabel('x')
     plt.ylabel('y')
+    plt.title("dy/dx = x|sin(x)|")
     ##plt.xlim([myODE.x_test[0], myODE.x_test[len(myODE.x_test)-1]])
     plt.savefig('image.png')
 

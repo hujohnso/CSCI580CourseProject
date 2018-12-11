@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import differential_equations.AnalyticalODE1 as ode
-import differential_equations.FinDiffODE1 as findiffODE
+import differential_equations.AnalyticalODE as ode
+import differential_equations.FinDiffODE as findiffODE
 from solver import generatePrediction, plot, calculateError, initialize_X_Array
 import autograd.numpy as np
 import numpy
@@ -8,10 +8,10 @@ import time
 
 trainUpperBound = 10
 trainLowerBound = 0
-testUpperBound = 10
+testUpperBound = 11
 testLowerBound = 0
-trainDataSize = 1000
-testDataSize = 200
+trainDataSize = 500
+testDataSize = 100
 
 #rows will be the particular constants and columns will be each iteration
 #testConstants = np.array([[3,2,3],[4,3,2]])
@@ -20,12 +20,13 @@ testDataSize = 200
 #trainConstants = np.array([[1,1,1], [1,1,5],[1,5,1],[5,1,1], [10,5,5], [5,10,5],[5,5,10], [5,5,5]])
 # ClassToUse = ode.x4
 
-testConstants = np.array([[5],[6],[7]])
-ClassToUse = ode.x2
-# ClassToUse = findiffODE.x2
-trainConstantsLowerBound = .1
-trainConstantsUpperBound = 10
-numberOfTrainConstants = 50
+testConstants = np.array([[1]])
+#ClassToUse = ode.x2
+#ClassToUse = findiffODE.x2
+ClassToUse = findiffODE.secondOrder1
+trainConstantsLowerBound = 1
+trainConstantsUpperBound = 1
+numberOfTrainConstants = 1
 
 # testConstants = np.array([[3],[4],[5]])
 # trainConstants = np.array([[3],[4],[5]])
@@ -35,14 +36,16 @@ numberOfTrainConstants = 50
 #testConstants = np.array([[4]])
 #trainConstants = np.array([[3.97], [3.99], [4.01], [4.03]])
 #ClassToUse = ode.log
-numberOfNodesInLayer = np.array([1,50,50,50,500,1])
-#377.0856934972127  %[1,10,10,1]
+#numberOfNodesInLayer = np.array([1,50,50,50,500,1])
+numberOfNodesInLayer = np.array([100, 10,10,10,10,1])
+activationOfLayer = np.array(['relu','relu', 'relu', 'relu','relu','relu'])
+#numberOfNodesInLayer = np.array([100, 10, 10, 10, 1])
+#activationOfLayer = np.array(['relu', 'relu', 'relu', 'relu', 'relu'])
 
-activationOfLayer = np.array(['custom','linear','linear','linear','linear','linear'])
+#activationOfLayer = np.array(['custom','linear','linear','linear','linear','linear'])
 
 def produceConstantsFromRangeAndGrain(upperBound, lowerBound, numberOfConstants):
     return numpy.linspace(lowerBound, upperBound, numberOfConstants)
-
 
 if __name__ == "__main__":
     numpy.random.seed(7)
@@ -53,6 +56,7 @@ if __name__ == "__main__":
     myODE = ClassToUse(x_test, x_train)
 
     myODE.y_train = ClassToUse.func(myODE, x_train, trainConstants)
+    print(myODE.y_train)
     startFinDiff = time.clock()
     myODE.y_test = ClassToUse.func(myODE, x_test ,testConstants)
     print("Total time for finite difference approximation is: ", time.clock() - startFinDiff)
@@ -61,7 +65,7 @@ if __name__ == "__main__":
     #x_test.shape = testDataSize, 1
 
     # Generate the prediction provided the training information
-    y_pred = generatePrediction(myODE, trainConstants, testConstants,numberOfNodesInLayer,activationOfLayer)
+    y_pred = generatePrediction(myODE, trainConstants, testConstants, numberOfNodesInLayer,activationOfLayer)
 
     # Plot the results
     plot(myODE, y_pred)
