@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import differential_equations.PDE as pde
 from solver import generatePrediction, plot, calculateError, initialize_X_Array
 import autograd.numpy as np
@@ -12,12 +11,13 @@ testLowerBound = 0
 trainDataSize = 500
 testDataSize = 100
 
-numberOfNodesInLayer = np.array([100,  2401])
+numberOfNodesInLayer = np.array([100,  8100])
 activationOfLayer = np.array(['relu', 'relu', 'relu'])
-ClassToUse = pde.heatEqn
+ClassToUse = pde.NavierStokes
 
 def produceConstantsFromRangeAndGrain(upperBound, lowerBound, numberOfConstants):
     return numpy.linspace(lowerBound, upperBound, numberOfConstants)
+
 
 if __name__ == "__main__":
     numpy.random.seed(7)
@@ -31,6 +31,6 @@ if __name__ == "__main__":
 
     np.savetxt('NSoutput.dat', y_pred)
 
-    # Plot the results
-    #plot(myDE, y_pred)
+     #Plot the results
+    plot(myDE, y_pred)
     #calculateError(y_pred,myDE)
