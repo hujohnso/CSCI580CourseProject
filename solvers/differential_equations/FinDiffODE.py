@@ -36,7 +36,7 @@ class finDiffODE1:
 class neg_ex(finDiffODE1):
     def __init__(self, x_test, x_train):
         super().__init__(x_test, x_train)
-        self.y0 = 1
+        self.y0 = [1]
 
     def model(self, y, t):
         k = self.constants[self.iteration][0]
@@ -53,7 +53,7 @@ class neg_ex(finDiffODE1):
 class neg_ex_2(finDiffODE1):
     def __init__(self, x_test, x_train):
         super().__init__(x_test, x_train)
-        self.y0 = 1
+        self.y0 = [1]
 
     def model(self, y, t):
         k = self.constants[self.iteration][0]
@@ -70,7 +70,7 @@ class neg_ex_2(finDiffODE1):
 class x2(finDiffODE1):
     def __init__(self, x_test, x_train):
         super().__init__(x_test, x_train)
-        self.y0 = 1
+        self.y0 = [1]
 
     def model(self, y, t):
         dydt = t*(1+(np.abs(t)))
@@ -86,7 +86,7 @@ class x2(finDiffODE1):
 class abssin(finDiffODE1):
     def __init__(self, x_test, x_train):
         super().__init__(x_test, x_train)
-        self.y0 = 1
+        self.y0 = [1]
 
     def model(self, y, t):
         dydt = t*np.abs(np.sin(t))
