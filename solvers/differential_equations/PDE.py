@@ -14,7 +14,7 @@ class heatEqn(PDE):
     def __init__(self, x_test, x_train):
         super().__init__(x_test, x_train)
         self.y_train = []
-        for i in range(1, 401):
+        for i in range(1, 1001):
             with open(os.path.join('HeatEqnData', str(i) + '.csv')) as f:
                 reader = f.readlines()
                 timestamp = []
@@ -24,10 +24,8 @@ class heatEqn(PDE):
                         timestamp.append(float(s))
                 self.y_train.append(timestamp)
 
-        self.y_test = self.y_train[0]
-        #self.y_test = [self.y_test]
+        self.y_test = self.y_train[1]
         self.y_test = np.array(self.y_test)
-        #self.y_train = [self.y_train]
         self.y_train = np.array(self.y_train)
 
 

@@ -41,10 +41,12 @@ def generateParameterizedModel(myODE, trainConstants, numberOfNodesInLayer, acti
 
 
 def generatePrediction(myODE, trainConstants, testConstants,numberOfNodesInLayer, activationOfLayer):
+    startNNTrain = time.clock()
     model = generateParameterizedModel(myODE,trainConstants,numberOfNodesInLayer,activationOfLayer)
     #x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_train,trainConstants).transpose()
     model.fit(myODE.x_train, myODE.y_train, epochs=50, batch_size=1, verbose=0)
     #x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_test, testConstants).transpose()
+    print("Total time for NN Training is: ", time.clock() - startNNTrain)
     startNN = time.clock()
     model.save('savedModel.h5')
     y_pred = model.predict(myODE.x_test)

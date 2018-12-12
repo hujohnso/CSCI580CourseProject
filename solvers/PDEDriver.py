@@ -21,7 +21,7 @@ def produceConstantsFromRangeAndGrain(upperBound, lowerBound, numberOfConstants)
 
 if __name__ == "__main__":
     numpy.random.seed(7)
-    x_train = numpy.linspace(1, 400, 400)
+    x_train = numpy.linspace(1, 1000, 1000)
     x_test = numpy.linspace(1, 1, 1)
 
     myDE = ClassToUse(x_test, x_train)
