@@ -100,12 +100,12 @@ for k = 1:nt
       P = P * 10 + 1;      
        name = strcat('./NavierStokesData/PressureField/', num2str((k * dt) * 100), '.csv');
        csvwrite(name, P');
-      clf, contourf(avg(x),avg(y),P',20,'w-'), hold on
+      %clf, contourf(avg(x),avg(y),P',20,'w-'), hold on
 
       Q = Q * 10 + 1;
        name = strcat('./NavierStokesData/StreamFunction/', num2str((k * dt) * 100), '.csv');
        csvwrite(name, Q');
-      contour(x,y,Q',20,'k-');
+      %contour(x,y,Q',20,'k-');
       
       Ue = [uS' avg([uW;U;uE]')' uN'];
       Ve = [vW;avg([vS' V vN']);vE];
@@ -116,12 +116,12 @@ for k = 1:nt
      %  name = strcat('./NavierStokesData/NormalizedVelocityFieldSecondArg/', num2str((k * dt) * 100), '.csv');
      %  csvwrite(name, (Ve./Len)');
      % quiver(x,y,(Ue./Len)',(Ve./Len)',.4,'k-')
-      hold off, axis equal, axis([0 lx 0 ly])
+      %hold off, axis equal, axis([0 lx 0 ly])
       
       
       p = sort(p); caxis(p([8 end-7]))
-      title(sprintf('Re = %0.1g   t = %0.2g',Re,k*dt))
-      drawnow
+     % title(sprintf('Re = %0.1g   t = %0.2g',Re,k*dt))
+     % drawnow
     %end
 end
 toc

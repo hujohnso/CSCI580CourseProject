@@ -75,7 +75,7 @@ class NavierStokesVFFA(PDE):
         super().__init__(x_test, x_train)
         self.y_train = []
         foldersToRead = ['NormalizedVelocityFieldFirstArg']
-        for i in range(1, 101):
+        for i in range(1, 1001):
             timeArray = []
             for fileName in foldersToRead:
                 with open(os.path.join('differential_equations/NavierStokesData/' + fileName,
@@ -97,7 +97,7 @@ class NavierStokesVFSA(PDE):
         super().__init__(x_test, x_train)
         self.y_train = []
         foldersToRead = ['NormalizedVelocityFieldSecondArg']
-        for i in range(1, 101):
+        for i in range(1, 1001):
             timeArray = []
             for fileName in foldersToRead:
                 with open(os.path.join('differential_equations/NavierStokesData/' + fileName,

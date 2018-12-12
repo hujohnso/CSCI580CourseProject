@@ -1,3 +1,9 @@
 __pycache__
 *.png
 *.gif
+*.csv
+*.dat
+.DS_*
+*.h5
+*.m~
+
