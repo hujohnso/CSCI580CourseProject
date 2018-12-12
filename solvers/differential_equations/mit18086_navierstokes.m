@@ -15,8 +15,8 @@ function mit18086_navierstokes
 % Feel free to modify for teaching and learning.
 %-----------------------------------------------------------------------
 Re = 1e2;     % Reynolds number
-dt = 1e-2;    % time step
-tf = 4e-0;    % final time
+dt = 1e-3;    % time step
+tf = 10e-0;    % final time
 lx = 1;       % width of box
 ly = 1;       % height of box
 nx = 90;      % number of x-gridpoints
@@ -55,6 +55,7 @@ Lq = kron(speye(ny-1),K1(nx-1,hx,2))+kron(K1(ny-1,hy,2),speye(nx-1));
 perq = symamd(Lq); Rq = chol(Lq(perq,perq)); Rqt = Rq';
 
 fprintf(', time loop\n--20%%--40%%--60%%--80%%-100%%\n')
+tic
 for k = 1:nt
    % treat nonlinear terms
    gamma = min(1.2*dt*max(max(max(abs(U)))/hx,max(max(abs(V)))/hy),1);
@@ -86,31 +87,43 @@ for k = 1:nt
    U = U-diff(P)/hx;
    V = V-diff(P')'/hy;
    
-   name = strcat('/u/eu/es/hujohnso/Documents/CSCI580/project/CSCI580CourseProject/solvers/differential_equations/NavierStokesData/Pressure/', num2str((k * dt) * 100), '.csv');
-   csvwrite(name, P);
-   name = strcat('/u/eu/es/hujohnso/Documents/CSCI580/project/CSCI580CourseProject/solvers/differential_equations/NavierStokesData/Velocity/', num2str((k * dt) * 100), '.csv');
-   csvwrite(name, V);
-  
    % visualization
    if floor(25*k/nt)>floor(25*(k-1)/nt), fprintf('.'), end
-   if k==1|floor(nsteps*k/nt)>floor(nsteps*(k-1)/nt)
+%    if k==1|floor(nsteps*k/nt)>floor(nsteps*(k-1)/nt)
+   if (k * dt) * 1000 == 50
       % stream function
       rhs = reshape(diff(U')'/hy-diff(V)/hx,[],1);
       q(perq) = Rq\(Rqt\rhs(perq));
       Q = zeros(nx+1,ny+1);
       Q(2:end-1,2:end-1) = reshape(q,nx-1,ny-1);
+      
+            
+%       name = strcat('./NavierStokesData/PressureField/', num2str((k * dt) * 1000), '.csv');
+%       csvwrite(name, P');
       clf, contourf(avg(x),avg(y),P',20,'w-'), hold on
+
+%       name = strcat('./NavierStokesData/StreamFunction/', num2str((k * dt) * 1000), '.csv');
+%       csvwrite(name, Q');
       contour(x,y,Q',20,'k-');
+      
       Ue = [uS' avg([uW;U;uE]')' uN'];
       Ve = [vW;avg([vS' V vN']);vE];
       Len = sqrt(Ue.^2+Ve.^2+eps);
+      
+%       name = strcat('./NavierStokesData/NormalizedVelocityFieldFirstArg/', num2str((k * dt) * 1000), '.csv');
+%       csvwrite(name, (Ue./Len)');
+%       name = strcat('./NavierStokesData/NormalizedVelocityFieldSecondArg/', num2str((k * dt) * 1000), '.csv');
+%       csvwrite(name, (Ve./Len)');
       quiver(x,y,(Ue./Len)',(Ve./Len)',.4,'k-')
       hold off, axis equal, axis([0 lx 0 ly])
+      
+      
       p = sort(p); caxis(p([8 end-7]))
       title(sprintf('Re = %0.1g   t = %0.2g',Re,k*dt))
       drawnow
-   end
+    end
 end
+toc
 fprintf('\n')
 
 %=======================================================================
