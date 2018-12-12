@@ -1,4 +1,5 @@
 clear all
+tic
 N = 50; % Number of grid in x,y-direction
 L = 4*pi; % Domain size
 % Grid point
@@ -19,8 +20,8 @@ handle_axes.ZLim = [-10,10];
 handle_axes.CLim = [-10,10];
 title('Evolution of MATLAB Logo by Heat equation');
 dx = x(2)-x(1); % spatial grid size
-alpha = 2; % coefficient
-tspan = linspace(0,1,400);
+alpha = 0.5; % coefficient
+tspan = linspace(0,10,1000);
 [t,u] = ode15s(@(t,x)getRHS(x,alpha,dx,N),tspan,u0(:));
 Tn = length(t);
 u = reshape(u,Tn,N-1,N-1);
@@ -33,15 +34,18 @@ for ii=1:Tn
     frame = getframe(gcf);
     im = frame2im(frame);
     [A,map] = rgb2ind(im,256);
+    xlim([0 15])
+    ylim([0 15])
+    zlim([-10 10])
     
-    if ii==1
-        imwrite(A,map,filename,'gif','LoopCount',Inf,'DelayTime',0.05);
-    else
-        imwrite(A,map,filename,'gif','WriteMode','append','DelayTime',0.05);
-    end
+    %if ii==1
+    %    imwrite(A,map,filename,'gif','LoopCount',Inf,'DelayTime',0.05);
+    %else
+    %    imwrite(A,map,filename,'gif','WriteMode','append','DelayTime',0.05);
+    %end
    
-    name = strcat('../HeatEqnData/', num2str(ii), '.csv');
-    csvwrite(name, Z);
+    %name = strcat('../HeatEqnData/', num2str(ii), '.csv');
+    %csvwrite(name, Z);
     
 end
-
+toc

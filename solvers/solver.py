@@ -41,12 +41,14 @@ def generateParameterizedModel(myODE, trainConstants, numberOfNodesInLayer, acti
 
 
 def generatePrediction(myODE, trainConstants, testConstants,numberOfNodesInLayer, activationOfLayer):
+    startNNTrain = time.clock()
     model = generateParameterizedModel(myODE,trainConstants,numberOfNodesInLayer,activationOfLayer)
     #x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_train,trainConstants).transpose()
     timeForTraining = time.clock()
     model.fit(myODE.x_train, myODE.y_train, epochs=500, batch_size=100, verbose=1, shuffle=True, validation_data=(myODE.x_train,myODE.y_train))
     print("The total time for training is: ", time.clock() - timeForTraining)
     #x_input_for_model = pairConstantsMatrixAndXMatrixForDNNInput(myODE.x_test, testConstants).transpose()
+    print("Total time for NN Training is: ", time.clock() - startNNTrain)
     startNN = time.clock()
     model.save('navierStokes.h5')
     y_pred = model.predict(myODE.x_test)

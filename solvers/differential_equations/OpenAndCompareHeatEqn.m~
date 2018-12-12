@@ -1,6 +1,6 @@
 %clear all
 %close all
-num = 1500;
+num = 1 * 2;
 load('../output.dat')
 A = reshape(output, [49 49]);
 A = A';
@@ -35,4 +35,12 @@ title('Difference Graph at t = 0', 'FontSize',30)
 view(0, 90)
 colormap hsv
 colorbar
+
+error = 0;
+for i = 1:49
+    for j = 1:49
+        error = error + abs(squeeze(u(num,i,j)) - A(i,j)/ squeeze(u(num,i,j)));
+    end
+end
+error = error / 
         
